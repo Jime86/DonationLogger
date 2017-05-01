@@ -3,6 +3,6 @@
     "clanTag" : "",
 	"discordToken" : "",
     "channelID" : "",
-	"timeDelay" : 30,
+	"timeDelay" : 90,
 	"showLeague" : true
 }
