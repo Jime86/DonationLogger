@@ -5,14 +5,14 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "git+https://github.com/Jime86/DonationLogger.git"
   },
   "author": "Jim e",
   "license": "MIT",
   "bugs": {
-    "url": ""
+    "url": "https://github.com/Jime86/DonationLogger/issues"
   },
-  "homepage": "",
+  "homepage": "https://github.com/Jime86/DonationLogger",
   "dependencies": {
     "discord.js": "^11.0.0",
     "request": "^2.81.0",
