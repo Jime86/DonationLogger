@@ -10,9 +10,10 @@ var discord          = require('discord.js');
 var client           = new discord.Client();
 var rp               = require('request-promise');
 var config           = require('./config.json');
-var memberDonateList = {};
-var textChannel;
-var timer;
+var memberDonateList = [];
+var textChannels = [];
+var timers = [];
+var options = [];
 var errorCount = 0;
 
 var DEBUG = false;
@@ -59,20 +60,9 @@ function getLeagueFromID( id ) {
 
 
 //Timer function, Updates memberlist info and logs changes to discord and console
-function timerUpdate() {
-    var options = {
-        'uri': 'https://api.clashofclans.com/v1/clans/' + config.clanTag.toUpperCase().replace(/O/g, '0').replace(/#/g, '%23'),
-        'method': 'GET',
-        'headers': {
-            'Accept': 'application/json',
-            'authorization': 'Bearer ' + config.apiKey,
-            'Cache-Control':'no-cache'
-        },
-        'json': true
-    }
-    debug(options);
-    clearTimeout(timer);
-    rp(options)
+function timerUpdate( index ) {
+    clearTimeout(timers[index]);
+    rp(options[index])
     .then(clan => {
         if (errorCount > 0) {
             debug("Bot is online.");
@@ -83,14 +73,14 @@ function timerUpdate() {
         var receivedMsg = "";
         for (var i = 0; i < clan.members; i++) {
             var player = clan.memberList[i];
-            if (player.tag in memberDonateList) {
+            if (player.tag in memberDonateList[index]) {
                 var league = "";
                 if (config.showLeague) league = getLeagueFromID(player.league.id)  + " " ;
-                var diffDonations = player.donations - memberDonateList[player.tag].donations;
+                var diffDonations = player.donations - memberDonateList[index][player.tag].donations;
                 if (diffDonations) {
                     donatedMsg += league + player.name + " (" + player.tag + ") : " + diffDonations + "\n";
                 }
-                var diffReceived = player.donationsReceived - memberDonateList[player.tag].donationsReceived;
+                var diffReceived = player.donationsReceived - memberDonateList[index][player.tag].donationsReceived;
                 if (diffReceived) {
                     receivedMsg += league + player.name + " (" + player.tag + ") : " + diffReceived + "\n";
                 }
@@ -98,56 +88,61 @@ function timerUpdate() {
         }
         //Send Message if any donations exist
         if (donatedMsg!="" || receivedMsg!="") {
-            var embedObj = {
-                color: 3447003,
-                fields: [{
-                    name: 'Donated troops or spells:',
-                    value: ''
-                },
-                {
-                    name: 'Recieved troops or spells:',
-                    value: ''
-                }
-                ],
-                footer: {
-                    text: ''
-                }
-            };
-            embedObj.fields[0].value = donatedMsg;
-            embedObj.fields[1].value = receivedMsg;
-            embedObj.footer.text = new Date().toUTCString();
-            textChannel.sendEmbed(embedObj);
+            const embedObj = new discord.RichEmbed()
+                .setColor(config.clans[index].color)
+                .addField('Donated troops or spells:',donatedMsg, false)
+                .addField('Recieved troops or spells:', receivedMsg, false)
+                .setFooter(new Date().toUTCString());
+            textChannels[index].sendEmbed(embedObj);
         }
         //Update member list data(purges members that have left)
-        memberDonateList = [];
+        memberDonateList[index] = [];
         for (var i = 0; i < clan.members; i++) {
             var player = clan.memberList[i];
-            memberDonateList[player.tag] = player;
+            memberDonateList[index][player.tag] = player;
         }
         //set timer again
-        timer = setTimeout(timerUpdate, config.timeDelay * 1000);
+        timers[index] = setTimeout(timerUpdate, config.timeDelay * 1000, index);
     })
     .catch(err => {
         debug(err);
         errorCount++;
-        if (errorCount < 30) {
-            timer = setTimeout(timerUpdate, config.timeDelay * 1000 * errorCount); // progressively lengthens
-        } else {
+        if (errorCount > 30) {
             debug("Bot could not recover");
+            errorCount = 30;
         }
+        timers[index] = setTimeout(timerUpdate, config.timeDelay * 1000 * errorCount, index); // progressively lengthens
     });
 }
 
 
 client.on('ready', () => {
-    debug("Starting");
-    memDonateList = [];
+    debug("ready");
     errorCount = 0;
-    if (client.channels.has(config.channelID)) {
-        textChannel = client.channels.get(config.channelID);
-        timerUpdate();
-    } else {
-        debug("Error: Channel Not found!");
+    timers = new Array(config.clans.length);
+    textChannels = new Array(config.clans.length);
+    options = new Array(config.clans.length);
+    memberDonateList = new Array(config.clans.length);
+    for(var i = 0; i < config.clans.length; i++ ) {
+        debug(config.clans[i]);
+        if (client.channels.has(config.clans[i].channelID)) {
+            textChannels[i] = client.channels.get(config.clans[i].channelID);
+            options[i] = {
+                'uri': 'https://api.clashofclans.com/v1/clans/' + config.clans[i].tag.toUpperCase().replace(/O/g, '0').replace(/#/g, '%23'),
+                'method': 'GET',
+                'headers': {
+                    'Accept': 'application/json',
+                    'authorization': 'Bearer ' + config.apiKey,
+                    'Cache-Control':'no-cache'
+                },
+                'json': true
+            };
+            debug(options.uri);
+            memberDonateList[i] = [];
+            timerUpdate(i);
+        } else {
+            debug("Error: Channel (" + config.clans[i].channelID + ") Not found!");
+        }
     }
 });
 
