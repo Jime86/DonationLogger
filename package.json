@@ -1,0 +1,21 @@
+{
+  "name": "discord-coc-donation-logger",
+  "version": "1.0.0",
+  "description": "A Discord bot that logs Clash of Clans donations as they occur.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "Jim e",
+  "license": "MIT",
+  "bugs": {
+    "url": ""
+  },
+  "homepage": "",
+  "dependencies": {
+    "discord.js": "^11.0.0",
+    "request": "^2.81.0",
+    "request-promise": "^4.2.0",
+  }
+}

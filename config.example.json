@@ -1,0 +1,8 @@
+{
+    "apiKey" : "",
+    "clanTag" : "",
+	"discordToken" : "",
+    "channelID" : "",
+	"timeDelay" : 30,
+	"showLeague" : true
+}
