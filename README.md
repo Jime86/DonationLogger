@@ -3,6 +3,8 @@ By Jim e
 
 Logs Clash of Clans donations to discord.
 
+![Screenshot](/screenshot.jpg)
+
 # Installation
 
 1. Clone this repository.
