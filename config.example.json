@@ -8,7 +8,7 @@
             "color" : 3447003
         }
     ],
-	"timeDelay" : 30,
+	"timeDelay" : 90,
 	"showLeague" : false,
-	"useRichEmbed" : false
+	"useRichEmbed" : true
 }
