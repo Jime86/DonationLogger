@@ -88,12 +88,21 @@ function timerUpdate( index ) {
         }
         //Send Message if any donations exist
         if (donatedMsg!="" || receivedMsg!="") {
-            const embedObj = new discord.RichEmbed()
-                .setColor(config.clans[index].color)
-                .addField('Donated troops or spells:',donatedMsg, false)
-                .addField('Recieved troops or spells:', receivedMsg, false)
-                .setFooter(new Date().toUTCString());
-            textChannels[index].sendEmbed(embedObj);
+            if (config.useRichEmbed) {
+                const embedObj = new discord.RichEmbed()
+                    .setColor(config.clans[index].color)
+                    .addField('Donated troops or spells:',donatedMsg, false)
+                    .addField('Recieved troops or spells:', receivedMsg, false)
+                    .setFooter(new Date().toUTCString());
+                textChannels[index].sendEmbed(embedObj);
+            } else {
+                textChannels[index].sendMessage(
+                    '**Donated troops or spells:**\n' +
+                    donatedMsg +
+                    '**Recieved troops or spells:**\n' + 
+                    receivedMsg + 
+                    "*" + new Date().toUTCString() + "*\n\n");
+            }
         }
         //Update member list data(purges members that have left)
         memberDonateList[index] = [];
