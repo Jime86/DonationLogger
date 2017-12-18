@@ -94,9 +94,9 @@ function timerUpdate( index ) {
                     .addField('Donated troops or spells:',donatedMsg, false)
                     .addField('Recieved troops or spells:', receivedMsg, false)
                     .setFooter(new Date().toUTCString());
-                textChannels[index].sendEmbed(embedObj);
+                textChannels[index].send(embedObj);
             } else {
-                textChannels[index].sendMessage(
+                textChannels[index].send(
                     '**Donated troops or spells:**\n' +
                     donatedMsg +
                     '**Recieved troops or spells:**\n' + 
@@ -146,7 +146,7 @@ client.on('ready', () => {
                 },
                 'json': true
             };
-            debug(options.uri);
+            debug(options[i].uri);
             memberDonateList[i] = [];
             timerUpdate(i);
         } else {
