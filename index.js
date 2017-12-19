@@ -65,6 +65,7 @@ function timerUpdate( index ) {
     rp(options[index])
     .then(clan => {
         debug("Bot up");
+        textChannels[index].send("I'm up!!!");
         if (errorCount > 0) {
             debug("Bot is online.");
             errorCount = 0;
@@ -116,6 +117,7 @@ function timerUpdate( index ) {
         timers[index] = setTimeout(timerUpdate, config.timeDelay * 1000, index);
     })
     .catch(err => {
+        textChannels[index].send("Something went wrong!!! \n ``` \n" + err.reason + " \n " + err.message + " \n ```");
         debug(err.message);
         errorCount++;
         if (errorCount > 30) {
