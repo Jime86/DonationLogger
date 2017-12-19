@@ -144,6 +144,7 @@ client.on('ready', () => {
                     'authorization': 'Bearer ' + config.apiKey,
                     'Cache-Control':'no-cache'
                 },
+                'proxy': process.env.FIXIE_URL,
                 'json': true
             };
             debug(options[i].uri);
