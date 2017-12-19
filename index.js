@@ -114,7 +114,7 @@ function timerUpdate( index ) {
         timers[index] = setTimeout(timerUpdate, config.timeDelay * 1000, index);
     })
     .catch(err => {
-        debug(err);
+        debug(err.message);
         errorCount++;
         if (errorCount > 30) {
             debug("Bot could not recover");
