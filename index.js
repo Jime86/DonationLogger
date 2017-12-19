@@ -17,6 +17,7 @@ var options = [];
 var errorCount = 0;
 
 var DEBUG = false;
+var INFO = true;
 
 var leagueStrings = [
     "<:Unranked:293677521503911936>",
@@ -50,6 +51,11 @@ var leagueStrings = [
 function debug( msg ) {
     if (DEBUG) console.log(msg);
 }
+function info( msg, index ) {
+    if (INFO) {
+        textChannels[index].send('**INFO:**\n' + new Date().toUTCString() + "*\n\n");
+    }
+}
 
 
 function getLeagueFromID( id ) {
@@ -66,6 +72,7 @@ function timerUpdate( index ) {
     .then(clan => {
         if (errorCount > 0) {
             debug("Bot is online.");
+            info('Bot is online',index);
             errorCount = 0;
         }
         // Build donation message
@@ -115,9 +122,11 @@ function timerUpdate( index ) {
     })
     .catch(err => {
         debug(err);
+        info(err,index);
         errorCount++;
         if (errorCount > 30) {
             debug("Bot could not recover");
+            info("Bot could not recover", index);
             errorCount = 30;
         }
         timers[index] = setTimeout(timerUpdate, config.timeDelay * 1000 * errorCount, index); // progressively lengthens
@@ -127,6 +136,7 @@ function timerUpdate( index ) {
 
 client.on('ready', () => {
     debug("ready");
+    info('ready',0);
     errorCount = 0;
     timers = new Array(config.clans.length);
     textChannels = new Array(config.clans.length);
@@ -134,6 +144,7 @@ client.on('ready', () => {
     memberDonateList = new Array(config.clans.length);
     for(var i = 0; i < config.clans.length; i++ ) {
         debug(config.clans[i]);
+        info('``` \n' + config.clans[i] + '\n ```', i);
         if (client.channels.has(config.clans[i].channelID)) {
             textChannels[i] = client.channels.get(config.clans[i].channelID);
             options[i] = {
@@ -147,10 +158,12 @@ client.on('ready', () => {
                 'json': true
             };
             debug(options[i].uri);
+            info(options[i].uri, i);
             memberDonateList[i] = [];
             timerUpdate(i);
         } else {
             debug("Error: Channel (" + config.clans[i].channelID + ") Not found!");
+            info("Error: Channel (" + config.clans[i].channelID + ") Not found!", i);
         }
     }
 });
