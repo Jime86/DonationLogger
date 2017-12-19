@@ -64,6 +64,7 @@ function timerUpdate( index ) {
     clearTimeout(timers[index]);
     rp(options[index])
     .then(clan => {
+        debug("Bot up");
         if (errorCount > 0) {
             debug("Bot is online.");
             errorCount = 0;
@@ -71,6 +72,7 @@ function timerUpdate( index ) {
         // Build donation message
         var donatedMsg = "";
         var receivedMsg = "";
+        debug(clan.members);
         for (var i = 0; i < clan.members; i++) {
             var player = clan.memberList[i];
             if (player.tag in memberDonateList[index]) {
