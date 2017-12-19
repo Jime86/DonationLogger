@@ -53,7 +53,7 @@ function debug( msg ) {
 }
 function info( msg, index ) {
     if (INFO) {
-        textChannels[index].send('**INFO:**\n' + new Date().toUTCString() + "*\n\n");
+        textChannels[index].send('**INFO:**\n' + msg + "\n\n");
     }
 }
 
