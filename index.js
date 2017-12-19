@@ -9,7 +9,7 @@
 var discord          = require('discord.js');
 var client           = new discord.Client();
 var rp               = require('request-promise');
-var config           = require('./config.json');
+var config           = require('./config');
 var memberDonateList = [];
 var textChannels = [];
 var timers = [];
