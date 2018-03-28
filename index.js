@@ -9,14 +9,14 @@
 var discord          = require('discord.js');
 var client           = new discord.Client();
 var rp               = require('request-promise');
-var config           = require('./config.json');
+var config           = require('./config');
 var memberDonateList = [];
 var textChannels = [];
 var timers = [];
 var options = [];
 var errorCount = 0;
 
-var DEBUG = false;
+var DEBUG = true;
 
 var leagueStrings = [
     "<:Unranked:293677521503911936>",
@@ -64,6 +64,8 @@ function timerUpdate( index ) {
     clearTimeout(timers[index]);
     rp(options[index])
     .then(clan => {
+        debug("Bot up");
+        textChannels[index].send("I'm up!!!");
         if (errorCount > 0) {
             debug("Bot is online.");
             errorCount = 0;
@@ -71,6 +73,7 @@ function timerUpdate( index ) {
         // Build donation message
         var donatedMsg = "";
         var receivedMsg = "";
+        debug(clan.members);
         for (var i = 0; i < clan.members; i++) {
             var player = clan.memberList[i];
             if (player.tag in memberDonateList[index]) {
@@ -94,9 +97,9 @@ function timerUpdate( index ) {
                     .addField('Donated troops or spells:',donatedMsg, false)
                     .addField('Recieved troops or spells:', receivedMsg, false)
                     .setFooter(new Date().toUTCString());
-                textChannels[index].sendEmbed(embedObj);
+                textChannels[index].send(embedObj);
             } else {
-                textChannels[index].sendMessage(
+                textChannels[index].send(
                     '**Donated troops or spells:**\n' +
                     donatedMsg +
                     '**Recieved troops or spells:**\n' + 
@@ -114,7 +117,8 @@ function timerUpdate( index ) {
         timers[index] = setTimeout(timerUpdate, config.timeDelay * 1000, index);
     })
     .catch(err => {
-        debug(err);
+        textChannels[index].send("Something went wrong!!! \n ``` \n" + err.reason + " \n " + err.message + " \n ```");
+        debug(err.message);
         errorCount++;
         if (errorCount > 30) {
             debug("Bot could not recover");
@@ -144,9 +148,10 @@ client.on('ready', () => {
                     'authorization': 'Bearer ' + config.apiKey,
                     'Cache-Control':'no-cache'
                 },
+                'proxy': process.env.FIXIE_URL,
                 'json': true
             };
-            debug(options.uri);
+            debug(options[i].uri);
             memberDonateList[i] = [];
             timerUpdate(i);
         } else {
