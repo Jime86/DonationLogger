@@ -65,7 +65,6 @@ function timerUpdate( index ) {
     rp(options[index])
     .then(clan => {
         debug("Bot up");
-        textChannels[index].send("I'm up!!!");
         if (errorCount > 0) {
             debug("Bot is online.");
             errorCount = 0;
