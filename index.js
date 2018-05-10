@@ -146,7 +146,7 @@ client.on('ready', () => {
                 },
                 'json': true
             };
-            debug(options.uri);
+            debug(options[i].uri);
             memberDonateList[i] = [];
             timerUpdate(i);
         } else {
