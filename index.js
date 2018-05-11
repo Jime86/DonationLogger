@@ -9,14 +9,14 @@
 var discord          = require('discord.js');
 var client           = new discord.Client();
 var rp               = require('request-promise');
-var config           = require('./config');
+var config           = require('./config.js');
 var memberDonateList = [];
 var textChannels = [];
 var timers = [];
 var options = [];
 var errorCount = 0;
 
-var DEBUG = true;
+var DEBUG = false;
 
 var leagueStrings = [
     "<:Unranked:293677521503911936>",
@@ -51,7 +51,6 @@ function debug( msg ) {
     if (DEBUG) console.log(msg);
 }
 
-
 function getLeagueFromID( id ) {
     if (id < 29000000) id = 29000000;
     if (id > 29000024) id = 29000024;
@@ -64,7 +63,8 @@ function timerUpdate( index ) {
     clearTimeout(timers[index]);
     rp(options[index])
     .then(clan => {
-        debug("Bot up");
+        var curDate = new Date();
+        debug("Bot active at " + curDate.toLocaleTimeString());
         if (errorCount > 0) {
             debug("Bot is online.");
             errorCount = 0;
@@ -72,7 +72,7 @@ function timerUpdate( index ) {
         // Build donation message
         var donatedMsg = "";
         var receivedMsg = "";
-        debug(clan.members);
+        debug(" Clan size: " + clan.members);
         for (var i = 0; i < clan.members; i++) {
             var player = clan.memberList[i];
             if (player.tag in memberDonateList[index]) {
@@ -95,7 +95,7 @@ function timerUpdate( index ) {
                     .setColor(config.clans[index].color)
                     .addField('Donated troops or spells:',donatedMsg, false)
                     .addField('Recieved troops or spells:', receivedMsg, false)
-                    .setFooter(new Date().toUTCString());
+                    .setFooter(curDate.toUTCString());
                 textChannels[index].send(embedObj);
             } else {
                 textChannels[index].send(
@@ -103,7 +103,7 @@ function timerUpdate( index ) {
                     donatedMsg +
                     '**Recieved troops or spells:**\n' + 
                     receivedMsg + 
-                    "*" + new Date().toUTCString() + "*\n\n");
+                    "*" + curDate.toUTCString() + "*\n\n");
             }
         }
         //Update member list data(purges members that have left)
@@ -152,6 +152,7 @@ client.on('ready', () => {
             };
             debug(options[i].uri);
             memberDonateList[i] = [];
+            textChannels[i].send("Logging Started!\n");
             timerUpdate(i);
         } else {
             debug("Error: Channel (" + config.clans[i].channelID + ") Not found!");
@@ -159,4 +160,5 @@ client.on('ready', () => {
     }
 });
 
+debug(config.discordToken);
 client.login(config.discordToken);
