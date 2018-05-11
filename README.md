@@ -10,7 +10,7 @@ Logs Clash of Clans donations to discord.
 1. Clone this repository.
 2. Install node.js
 3. Run 'npm i' in the cloned directory to install modules.
-4. Copy 'config.example.json' to 'config.json', and update the information with the steps below.
+4. Copy 'config.example.js' to 'config.js', and update the information with the steps below.
 5. Get an API key from Clash of Clans API
 6. Create a Discord App Bot and note the App bot user token.
 7. Get the Channel ID for the channel you want the bot to log to. In discord, set enable developer mode, then right click the channel and select copy id.
